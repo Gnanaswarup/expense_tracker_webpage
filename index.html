@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Expense Tracker</title>
+    
+    <!-- ========================================== -->
+    <!--                 CSS STYLES                 -->
+    <!-- ========================================== -->
+    <style>
+        /* Import Google Font for clean typography */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Light Theme Variables */
+        :root {
+            --bg-color: #f3f4f6;
+            --surface-color: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --chart-bar-color: #4f46e5;
+            --input-bg: #f9fafb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Dark Theme Variables */
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --surface-color: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --input-bg: #374151;
+            --chart-bar-color: #6366f1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+        }
+
+        /* Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card .value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Layout Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 0.875rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--border-color);
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Table and List Styles */
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 500px) {
+            .table-controls {
+                flex-direction: column;
+            }
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            background-color: var(--surface-color);
+            position: sticky;
+            top: 0;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background-color: var(--input-bg);
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            color: var(--danger-hover);
+            transform: scale(1.1);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        /* Custom HTML/CSS Analytics Chart */
+        .chart-container {
+            margin-top: 1rem;
+        }
+
+        .chart-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .chart-label {
+            width: 80px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chart-bar-wrapper {
+            flex: 1;
+            background-color: var(--border-color);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .chart-bar {
+            height: 100%;
+            background-color: var(--chart-bar-color);
+            border-radius: 6px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chart-value {
+            width: 60px;
+            text-align: right;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--success-color);
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error { border-left-color: var(--danger-color); }
+        .toast.warning { border-left-color: var(--warning-color); }
+
+        /* Modal / Confirmation Dialog */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow);
+            max-width: 400px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .modal-actions button {
+            width: auto;
+            padding: 0.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!--               HTML STRUCTURE               -->
+    <!-- ========================================== -->
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Smart Expense Tracker</h1>
+            <button class="theme-toggle" id="themeToggle">
+                <span id="themeIcon">🌙</span> Dark Mode
+            </button>
+        </header>
+
+        <!-- Dashboard Widgets -->
+        <div class="dashboard">
+            <div class="card">
+                <h3>Total Expenses</h3>
+                <div class="value" id="totalExpenses">$0.00</div>
+            </div>
+            <div class="card">
+                <h3>Total Transactions</h3>
+                <div class="value" id="totalTransactions">0</div>
+            </div>
+            <div class="card">
+                <h3>Highest Expense</h3>
+                <div class="value" id="highestExpense">$0.00</div>
+            </div>
+            <div class="card">
+                <h3>Today's Expenses</h3>
+                <div class="value" id="todayExpenses">$0.00</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Left Column: Add Form & Analytics -->
+            <div class="left-column">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h2 class="section-title">Add Expense</h2>
+                    <form id="expenseForm">
+                        <div class="form-group">
+                            <label for="expenseName">Expense Name *</label>
+                            <input type="text" id="expenseName" required placeholder="e.g., Groceries">
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseAmount">Amount ($) *</label>
+                            <input type="number" id="expenseAmount" required min="0.01" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseCategory">Category *</label>
+                            <select id="expenseCategory" required>
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="Food">Food</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Education">Education</option>
+                                <option value="Health">Health</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseDate">Date *</label>
+                            <input type="date" id="expenseDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Expense</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Analytics</h2>
+                    <div class="chart-container" id="analyticsChart">
+                        <!-- Chart rows generated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Expense List & Controls -->
+            <div class="right-column">
+                <div class="card">
+                    <h2 class="section-title">Expense List</h2>
+                    
+                    <div class="table-controls">
+                        <input type="text" id="searchInput" placeholder="Search by name...">
+                        <select id="filterCategory">
+                            <option value="All">All Categories</option>
+                            <option value="Food">Food</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Education">Education</option>
+                            <option value="Health">Health</option>
+                            <option value="Bills">Bills</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="expenseTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseList">
+                                <!-- Expenses populated via JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyState" class="empty-state" style="display: none;">
+                            No expenses found. Start by adding one!
+                        </div>
+                    </div>
+                    
+                    <div class="actions-group">
+                        <button id="exportBtn" class="btn btn-outline">Export CSV</button>
+                        <button id="clearDataBtn" class="btn btn-danger">Clear All Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Modal Confirmation Overlay -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+            <p id="modalMessage">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="modalCancel">Cancel</button>
+                <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!--               JAVASCRIPT LOGIC             -->
+    <!-- ========================================== -->
+    <script>
+        // --- State Management ---
+        // Load data from localStorage or initialize empty array
+        let expenses = JSON.parse(localStorage.getItem('smart_expenses')) || [];
+
+        // --- DOM Elements ---
+        const expenseForm = document.getElementById('expenseForm');
+        const searchInput = document.getElementById('searchInput');
+        const filterCategory = document.getElementById('filterCategory');
+        const expenseList = document.getElementById('expenseList');
+        const emptyState = document.getElementById('emptyState');
+        const analyticsChart = document.getElementById('analyticsChart');
+
+        // --- Initialization ---
+        function init() {
+            // Set default date picker value to today
+            document.getElementById('expenseDate').valueAsDate = new Date();
+            
+            // Apply saved theme preference
+            const savedTheme = localStorage.getItem('smart_theme') || 'light';
+            setTheme(savedTheme);
+
+            // Bind Event Listeners
+            expenseForm.addEventListener('submit', handleAddExpense);
+            searchInput.addEventListener('input', updateView);
+            filterCategory.addEventListener('change', updateView);
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('exportBtn').addEventListener('click', exportCSV);
+            document.getElementById('clearDataBtn').addEventListener('click', () => {
+                showConfirmModal('Clear All Data', 'Are you sure you want to delete all expenses? This action cannot be undone.', clearAllData);
+            });
+
+            // Initial Render
+            updateView();
+        }
+
+        // --- Core Functions ---
+        function handleAddExpense(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('expenseName').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const category = document.getElementById('expenseCategory').value;
+            const date = document.getElementById('expenseDate').value;
+
+            // Validate inputs
+            if (!name || isNaN(amount) || amount <= 0 || !category || !date) {
+                showToast('Please fill all fields correctly.', 'error');
+                return;
+            }
+
+            // Create new expense object
+            const newExpense = {
+                id: Date.now().toString(),
+                name,
+                amount,
+                category,
+                date
+            };
+
+            // Update state
+            expenses.push(newExpense);
+            saveData();
+            updateView();
+            
+            // Reset form
+            expenseForm.reset();
+            document.getElementById('expenseDate').valueAsDate = new Date();
+            showToast('Expense added successfully!', 'success');
+        }
+
+        function deleteExpense(id) {
+            showConfirmModal('Delete Expense', 'Are you sure you want to delete this expense?', () => {
+                expenses = expenses.filter(exp => exp.id !== id);
+                saveData();
+                updateView();
+                showToast('Expense deleted.', 'success');
+            });
+        }
+
+        function clearAllData() {
+            expenses = [];
+            saveData();
+            updateView();
+            showToast('All data cleared.', 'warning');
+        }
+
+        function saveData() {
+            localStorage.setItem('smart_expenses', JSON.stringify(expenses));
+        }
+
+        // --- View Rendering ---
+        function updateView() {
+            // Get filter/search criteria
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryFilter = filterCategory.value;
+
+            // Apply filters
+            const filteredExpenses = expenses.filter(exp => {
+                const matchSearch = exp.name.toLowerCase().includes(searchTerm);
+                const matchCategory = categoryFilter === 'All' || exp.category === categoryFilter;
+                return matchSearch && matchCategory;
+            });
+
+            // Sort filtered list by date descending (newest first)
+            filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Render all UI components
+            renderDashboard(expenses); // Dashboard always shows overall stats
+            renderList(filteredExpenses); // List respects filters
+            renderAnalytics(expenses); // Analytics always shows overall distribution
+        }
+
+        function renderDashboard(data) {
+            // Calculate statistics
+            const total = data.reduce((sum, exp) => sum + exp.amount, 0);
+            const count = data.length;
+            const highest = data.length > 0 ? Math.max(...data.map(exp => exp.amount)) : 0;
+            
+            // Calculate today's total
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayTotal = data
+                .filter(exp => exp.date === todayStr)
+                .reduce((sum, exp) => sum + exp.amount, 0);
+
+            // Update UI elements
+            document.getElementById('totalExpenses').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('totalTransactions').textContent = count;
+            document.getElementById('highestExpense').textContent = `$${highest.toFixed(2)}`;
+            document.getElementById('todayExpenses').textContent = `$${todayTotal.toFixed(2)}`;
+        }
+
+        function renderList(data) {
+            expenseList.innerHTML = '';
+            
+            // Handle Empty State
+            if (data.length === 0) {
+                emptyState.style.display = 'block';
+                document.getElementById('expenseTable').style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            document.getElementById('expenseTable').style.display = 'table';
+
+            // Render table rows
+            data.forEach(exp => {
+                const tr = document.createElement('tr');
+                
+                // Format date nicely (e.g. Oct 15, 2023)
+                const dateObj = new Date(exp.date);
+                // Adjusting for timezone offset to prevent off-by-one date rendering
+                const userTimezoneOffset = dateObj.getTimezoneOffset() * 60000;
+                const adjustedDate = new Date(dateObj.getTime() + userTimezoneOffset);
+                const dateStr = adjustedDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
+                tr.innerHTML = `
+                    <td><strong>${escapeHTML(exp.name)}</strong></td>
+                    <td><span class="badge">${escapeHTML(exp.category)}</span></td>
+                    <td>$${exp.amount.toFixed(2)}</td>
+                    <td>${dateStr}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteExpense('${exp.id}')" title="Delete">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                expenseList.appendChild(tr);
+            });
+        }
+
+        function renderAnalytics(data) {
+            analyticsChart.innerHTML = '';
+            
+            if (data.length === 0) {
+                analyticsChart.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem 0;">No data to display.</p>';
+                return;
+            }
+
+            // Aggregate totals by category
+            const categoryTotals = {};
+            let maxTotal = 0;
+
+            data.forEach(exp => {
+                categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
+            });
+
+            // Find max for percentage calculation
+            for (const cat in categoryTotals) {
+                if (categoryTotals[cat] > maxTotal) maxTotal = categoryTotals[cat];
+            }
+
+            // Sort categories by total spending descending
+            const sortedCategories = Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a]);
+
+            // Build pure HTML/CSS horizontal bar chart
+            sortedCategories.forEach(cat => {
+                const total = categoryTotals[cat];
+                const percentage = (total / maxTotal) * 100;
+
+                const row = document.createElement('div');
+                row.className = 'chart-row';
+                row.innerHTML = `
+                    <span class="chart-label" title="${cat}">${cat}</span>
+                    <div class="chart-bar-wrapper">
+                        <div class="chart-bar" style="width: 0%"></div>
+                    </div>
+                    <span class="chart-value">$${total.toFixed(0)}</span>
+                `;
+                analyticsChart.appendChild(row);
+
+                // Trigger animation after append
+                setTimeout(() => {
+                    row.querySelector('.chart-bar').style.width = `${percentage}%`;
+                }, 50);
+            });
+        }
+
+        // --- Export Feature ---
+        function exportCSV() {
+            if (expenses.length === 0) {
+                showToast('No data to export.', 'warning');
+                return;
+            }
+
+            // Define headers
+            const headers = ['ID', 'Name', 'Category', 'Amount', 'Date'];
+            const csvRows = [headers.join(',')];
+
+            // Map data to rows
+            expenses.forEach(exp => {
+                const row = [
+                    exp.id,
+                    `"${exp.name.replace(/"/g, '""')}"`, // Escape quotes
+                    exp.category,
+                    exp.amount,
+                    exp.date
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            // Create and trigger download
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'smart_expenses.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('CSV exported successfully!', 'success');
+        }
+
+        // --- Theme Management ---
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('smart_theme', theme);
+            
+            const themeToggleBtn = document.getElementById('themeToggle');
+            if (theme === 'dark') {
+                themeToggleBtn.innerHTML = '<span>☀️</span> Light Mode';
+            } else {
+                themeToggleBtn.innerHTML = '<span>🌙</span> Dark Mode';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        }
+
+        // --- UI Utilities ---
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'warning') icon = '⚠️';
+
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            
+            const container = document.getElementById('toastContainer');
+            container.appendChild(toast);
+
+            // Animate In
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Animate Out & Remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => container.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // --- Modal Dialog Logic ---
+        let confirmActionCallback = null;
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            confirmActionCallback = onConfirm;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            confirmActionCallback = null;
+        }
+
+        // Bind modal buttons
+        document.getElementById('modalCancel').addEventListener('click', closeConfirmModal);
+        document.getElementById('modalConfirm').addEventListener('click', () => {
+            if (confirmActionCallback) confirmActionCallback();
+            closeConfirmModal();
+        });
+
+        // Basic HTML Escaping to prevent XSS in table render
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        // Bootstrap the application
+        init();
+    </script>
+</body>
+</html>
