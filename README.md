@@ -124,4 +124,4 @@ Developed as an AI-assisted web development project using Google AI Studio (Gemi
 ## License
 
 This project is created for educational and learning purposes.
-link to check the page:
+link to check the page: https://gnanaswarup.github.io/expense_tracker_webpage/
